@@ -3,11 +3,6 @@ import Header from "./Header";
 import Employee from "./EmployeeEntry";
 import API from "../utils/API";
 // import Search from "./SearchBox";
-// import Home from "./pages/Home";
-// import About from "./pages/About";
-// import Discover from "./pages/Discover";
-// import Search from "./pages/Search";
-// import { BrowserRouter as Router, Route } from "react-router-dom";
 
 class EmployeeTable extends Component {
   state = {
@@ -20,6 +15,7 @@ class EmployeeTable extends Component {
       .then((res) => {
         console.log(res.data.results[0]);
         this.setState({ employees: res.data.results });
+        console.log(this.state.employees)
       })
       .catch((err) => console.log(err));
     console.log("loaded");
@@ -47,7 +43,7 @@ class EmployeeTable extends Component {
       <div>
         <Header />
         {/* <Search /> */}
-        <p>Hello {this.state.searchName}</p>
+        <p>Updates with state: {this.state.searchName}</p>
         <form className="search-bar">
           <input
             value={this.state.searchName}
@@ -61,17 +57,17 @@ class EmployeeTable extends Component {
           <thead className="thead-dark">
             <tr>
               <th scope="col">Photo</th>
-              <th scope="col" id="first-name" onClick={this.clickFunction}>
+              <th className="clickableHeader" scope="col" id="first-name" onClick={this.clickFunction}>
                 First Name
               </th>
-              <th scope="col" id="last-name" onClick={this.clickFunction}>
+              <th className="clickableHeader" scope="col" id="last-name" onClick={this.clickFunction}>
                 Last Name
               </th>
               <th scope="col">Phone Number</th>
-              <th scope="col" id="email" onClick={this.clickFunction}>
+              <th className="clickableHeader" scope="col" id="email" onClick={this.clickFunction}>
                 Email
               </th>
-              <th scope="col" id="screen-name" onClick={this.clickFunction}>
+              <th className="clickableHeader" scope="col" id="screen-name" onClick={this.clickFunction}>
                 Screen name
               </th>
             </tr>
@@ -90,14 +86,6 @@ class EmployeeTable extends Component {
           </tbody>
         </table>
       </div>
-      /* // <Router> */
-      // {/* currentPage={this.state.currentPage} */}
-      // {/* handlePageChange={this.handlePageChange} */}
-      // {/* <Route exact path="/" component={Home} />
-      //   <Route exact path="/about" component={About} />
-      //   <Route exact path="/discover" component={Discover} />
-      //   <Route path="/search" component={Search} /> */}
-      // {/* </Router> */}
     );
   }
 }
