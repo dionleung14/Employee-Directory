@@ -2,12 +2,14 @@ import React, { Component } from "react";
 import Header from "./Header";
 import Employee from "./EmployeeEntry";
 import API from "../utils/API";
-// import Search from "./SearchBox";
 
 class EmployeeTable extends Component {
   state = {
     employees: [],
     searchName: "",
+    displayMethod: "default",
+    sortCategory: "",
+    sortCount: 0,
   };
 
   componentDidMount() {
@@ -15,35 +17,158 @@ class EmployeeTable extends Component {
       .then((res) => {
         console.log(res.data.results[0]);
         this.setState({ employees: res.data.results });
-        console.log(this.state.employees)
+        console.log(this.state.employees);
       })
       .catch((err) => console.log(err));
     console.log("loaded");
   }
 
-  removeFriend = (id) => {
-    let newArr = this.state.friends.filter((friend) => friend.id !== id);
-    this.setState({ friends: newArr });
-  };
-
-  // handlePageChange = (page) => {
-  //   this.setState({ currentPage: page });
-  // };
-
   handleInputChange = (event) => {
-    this.setState({ searchName: event.target.value });
+    this.setState({
+      searchName: event.target.value,
+      displayMethod: event.target.value.length ? "search" : "default",
+      sortCategory: ""
+    });
   };
 
-  clickFunction = (event) => {
-    console.log(event.target.id);
+  sortPrep = (event) => {
+    this.setState({
+      searchName: "",
+      displayMethod: "sort",
+      sortCategory: event.target.id,
+      sortCount: this.state.sortCount + 1,
+    });
+  };
+
+  sortFirst = () => {
+    if (this.state.sortCount % 2 === 0) {
+      return this.state.employees.sort(function (a, b) {
+        if (a.name.first < b.name.first) {
+          return -1;
+        }
+        if (b.name.first < a.name.first) {
+          return 1;
+        }
+      });
+    } else {
+      return this.state.employees.sort(function (a, b) {
+        if (a.name.first < b.name.first) {
+          return 1;
+        }
+        if (b.name.first < a.name.first) {
+          return -1;
+        }
+      });
+    }
+  };
+
+  sortLast = () => {
+    if (this.state.sortCount % 2 === 0) {
+      return this.state.employees.sort(function (a, b) {
+        if (a.name.last < b.name.last) {
+          return -1;
+        }
+        if (b.name.last < a.name.last) {
+          return 1;
+        }
+      });
+    } else {
+      return this.state.employees.sort(function (a, b) {
+        if (a.name.last < b.name.last) {
+          return 1;
+        }
+        if (b.name.last < a.name.last) {
+          return -1;
+        }
+      });
+    }
+  };
+
+  sortEmail = () => {
+    if (this.state.sortCount % 2 === 0) {
+      return this.state.employees.sort(function (a, b) {
+        if (a.email < b.email) {
+          return -1;
+        }
+        if (b.email < a.email) {
+          return 1;
+        }
+      });
+    } else {
+      return this.state.employees.sort(function (a, b) {
+        if (a.email < b.email) {
+          return 1;
+        }
+        if (b.email < a.email) {
+          return -1;
+        }
+      });
+    }
+  };
+  sortUser = () => {
+    if (this.state.sortCount % 2 === 0) {
+      return this.state.employees.sort(function (a, b) {
+        if (a.login.username < b.login.username) {
+          return -1;
+        }
+        if (b.login.username < a.login.username) {
+          return 1;
+        }
+      });
+    } else {
+      return this.state.employees.sort(function (a, b) {
+        if (a.login.username < b.login.username) {
+          return 1;
+        }
+        if (b.login.username < a.login.username) {
+          return -1;
+        }
+      });
+    }
+  };
+
+  activeSearch = () => {
+    const { employees, searchName } = this.state;
+    const casedName = searchName.toLowerCase();
+    const searchResults = employees.filter((person) => {
+      return person.name.first.toLowerCase().includes(casedName);
+    });
+    return searchResults;
   };
 
   render() {
+    let workingArr = this.state.employees;
+    if (this.state.displayMethod === "search") {
+      workingArr = this.activeSearch();
+    } else if (this.state.displayMethod === "sort") {
+      switch (this.state.sortCategory) {
+        case "first":
+          workingArr = this.sortFirst();
+          break;
+        case "last":
+          workingArr = this.sortLast();
+          break;
+        case "email":
+          workingArr = this.sortEmail();
+          break;
+        case "username":
+          workingArr = this.sortUser();
+          break;
+        default:
+          break;
+      }
+      // workingArr = this.sortFunction(this.state.sortCategory)
+      // this.state.employees.sort(function(a, b){
+      //   if (a.name.first < b.name.first) {return -1;}
+      //   if (b.name.first < a.name.first) {return 1;}
+      // });
+    } else {
+      workingArr = this.state.employees;
+    }
     return (
       <div>
         <Header />
         {/* <Search /> */}
-        <p>Updates with state: {this.state.searchName}</p>
         <form className="search-bar">
           <input
             value={this.state.searchName}
@@ -57,24 +182,44 @@ class EmployeeTable extends Component {
           <thead className="thead-dark">
             <tr>
               <th scope="col">Photo</th>
-              <th className="clickableHeader" scope="col" id="first-name" onClick={this.clickFunction}>
+              <th
+                className="clickableHeader"
+                scope="col"
+                id="first"
+                onClick={this.sortPrep}
+              >
                 First Name
               </th>
-              <th className="clickableHeader" scope="col" id="last-name" onClick={this.clickFunction}>
+              <th
+                className="clickableHeader"
+                scope="col"
+                id="last"
+                onClick={this.sortPrep}
+              >
                 Last Name
               </th>
               <th scope="col">Phone Number</th>
-              <th className="clickableHeader" scope="col" id="email" onClick={this.clickFunction}>
+              <th
+                className="clickableHeader"
+                scope="col"
+                id="email"
+                onClick={this.sortPrep}
+              >
                 Email
               </th>
-              <th className="clickableHeader" scope="col" id="screen-name" onClick={this.clickFunction}>
+              <th
+                className="clickableHeader"
+                scope="col"
+                id="username"
+                onClick={this.sortPrep}
+              >
                 Screen name
               </th>
             </tr>
           </thead>
           <tbody>
-            {this.state.employees.map((person) => (
-              <Employee key={this.state.employees.index}
+            {workingArr.map((person) => (
+              <Employee
                 image={person.picture.thumbnail}
                 firstName={person.name.first}
                 lastName={person.name.last}
